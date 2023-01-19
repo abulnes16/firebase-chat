@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">FirebaseChat</string>
+
+    <!--Sign In Screen-->
+    <string name="sign_up">Sign up</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="account_creation">Doesn\'t have an account?</string>
+    <string name="create_an_account">Create one</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+
+    <!--Sign Up Screen-->
+    <string name="already_have_account">Already have an account?</string>
+    <string name="login">Login</string>
 </resources>
