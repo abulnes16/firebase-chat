@@ -14,6 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.abulnes16.firebasechat.R
+import com.abulnes16.firebasechat.ui.components.AuthFooter
+import com.abulnes16.firebasechat.ui.components.Screen
+import com.abulnes16.firebasechat.viewmodels.AuthViewModel
 
 @Composable
 fun SignUpScreen(
@@ -21,11 +24,7 @@ fun SignUpScreen(
     onGoToSignIn: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
-    ) {
+    Screen(modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth(0.7f)
@@ -53,21 +52,11 @@ fun SignUpScreen(
                 Text(text = stringResource(R.string.sign_up))
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ) {
-                Text(text = stringResource(R.string.already_have_account))
-                Text(
-                    text = stringResource(R.string.login),
-                    modifier = Modifier.clickable { onGoToSignIn() },
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colors.primary
-                )
-            }
+            AuthFooter(
+                leftText = R.string.already_have_account,
+                rightText = R.string.login,
+                onClick = onGoToSignIn
+            )
         }
 
     }

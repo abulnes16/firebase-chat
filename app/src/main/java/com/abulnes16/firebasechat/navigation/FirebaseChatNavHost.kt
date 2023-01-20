@@ -12,31 +12,48 @@ import com.abulnes16.firebasechat.ui.screens.auth.SignInScreen
 import com.abulnes16.firebasechat.ui.screens.auth.SignUpScreen
 import com.abulnes16.firebasechat.ui.screens.home.ChatScreen
 import com.abulnes16.firebasechat.ui.screens.home.HomeScreen
+import com.abulnes16.firebasechat.ui.screens.home.PeopleScreen
+import com.abulnes16.firebasechat.viewmodels.AuthViewModel
 
 @Composable
 fun FirebaseChatNavHost(
     navController: NavHostController,
+    currentScreen: HomeDestinations,
+    onAuth: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
     NavHost(
         navController = navController,
         startDestination = SignIn.route,
         modifier = modifier
     ) {
+        // AuthScreens
         composable(SignIn.route) {
             SignInScreen(onSignUp = { navController.navigate(SignUp.route) })
         }
         composable(SignUp.route) {
             SignUpScreen(
-                onSuccessSignUp = { navController.navigateToTop(Home.route) },
+                onSuccessSignUp = {
+                    onAuth()
+                    navController.navigateToTop(Home.route)
+                },
                 onGoToSignIn = { navController.popBackStack() })
         }
+
+        // HomeScreens
         composable(Home.route) {
-            HomeScreen()
+            HomeScreen(
+                currentScreen,
+                onTabChange = { screen -> navController.navigate(screen.route) })
+        }
+        composable(People.route) {
+            PeopleScreen()
         }
         composable(Chats.route) {
             ChatScreen()
         }
+
     }
 }
 

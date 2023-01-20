@@ -13,4 +13,8 @@
     <!--Sign Up Screen-->
     <string name="already_have_account">Already have an account?</string>
     <string name="login">Login</string>
+
+    <!--Tabs-->
+    <string name="home">Home</string>
+    <string name="people">People</string>
 </resources>

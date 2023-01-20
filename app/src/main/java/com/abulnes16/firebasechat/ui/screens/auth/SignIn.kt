@@ -11,6 +11,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.abulnes16.firebasechat.R
+import com.abulnes16.firebasechat.ui.components.AuthFooter
+import com.abulnes16.firebasechat.ui.components.Screen
 
 
 @Composable
@@ -18,11 +20,7 @@ fun SignInScreen(
     onSignUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
-    ) {
+    Screen(modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth(0.7f)
@@ -54,25 +52,11 @@ fun SignInScreen(
             OutlinedButton(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
                 Text(text = stringResource(R.string.sign_in_with_google))
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.account_creation),
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-
-                Text(
-                    text = stringResource(R.string.create_an_account),
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier.clickable { onSignUp() },
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            AuthFooter(
+                leftText = R.string.account_creation,
+                rightText = R.string.sign_up,
+                onClick = onSignUp
+            )
 
         }
 
