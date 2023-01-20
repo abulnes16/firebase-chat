@@ -33,9 +33,17 @@ fun SignUpScreen(
                 value = "",
                 onValueChange = {},
                 placeholder = {
+                    Text(text = stringResource(R.string.name))
+                },
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            TextField(
+                value = "",
+                onValueChange = {},
+                placeholder = {
                     Text(text = stringResource(R.string.email))
                 },
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             )
             TextField(
                 value = "", onValueChange = {},

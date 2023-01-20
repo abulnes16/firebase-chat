@@ -37,34 +37,14 @@ fun FirebaseChatApp() {
         val currentBackStack by navController.currentBackStackEntryAsState()
         val currentDestination = currentBackStack?.destination
 
-        /*TODO: Change for auth view model state*/
-        var isLoggedIn by remember {
-            mutableStateOf(false)
-        }
 
         val currentHomeScreen =
             homeTabs.find { screen -> screen.route === currentDestination?.route } ?: Home
 
-
-        Scaffold(
-            topBar = {
-                if (isLoggedIn) {
-                    HomeTabs(
-                        allTabs = homeTabs,
-                        onTabSelected = { screen -> navController.navigate(screen.route) },
-                        currentScreen = currentHomeScreen
-                    )
-
-                }
-            }
-        ) {
-            FirebaseChatNavHost(
-                navController = navController,
-                currentScreen = currentHomeScreen,
-                onAuth = {isLoggedIn = true}
-            )
-        }
-
-
+        FirebaseChatNavHost(
+            navController = navController,
+            currentScreen = currentHomeScreen
+        )
     }
+
 }

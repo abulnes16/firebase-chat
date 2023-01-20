@@ -4,9 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
@@ -66,8 +64,15 @@ fun HomeTab(
             .height(TabHeight)
             .selectable(selected = selected, onClick = onSelected, role = Role.Tab)
     ) {
-        Icon(imageVector = icon, contentDescription = null)
-        Text(text = stringResource(name))
+        val color =
+            if (selected) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.padding(end = 16.dp)
+        )
+        Text(text = stringResource(name), color = color)
     }
 }
 

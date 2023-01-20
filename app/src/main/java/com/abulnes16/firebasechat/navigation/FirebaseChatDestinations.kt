@@ -5,6 +5,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.abulnes16.firebasechat.R
 
 interface FirebaseChatDestinations {
@@ -39,6 +41,11 @@ object People : FirebaseChatDestinations, HomeDestinations {
 
 object Chats : FirebaseChatDestinations {
     override val route = "ChatsScreen"
+    const val chatIdArg = "chat_id"
+    val routeWithArgs = "${route}/{${chatIdArg}}"
+    val arguments = listOf(
+        navArgument(chatIdArg) { type = NavType.StringType }
+    )
 }
 
 val homeTabs = listOf(Home, People)

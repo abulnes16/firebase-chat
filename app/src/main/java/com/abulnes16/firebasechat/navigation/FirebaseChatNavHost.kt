@@ -19,15 +19,16 @@ import com.abulnes16.firebasechat.viewmodels.AuthViewModel
 fun FirebaseChatNavHost(
     navController: NavHostController,
     currentScreen: HomeDestinations,
-    onAuth: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
+    val onTabSelected: (HomeDestinations) -> Unit =
+        { screen -> navController.navigate(screen.route) }
     NavHost(
         navController = navController,
         startDestination = SignIn.route,
         modifier = modifier
     ) {
+
         // AuthScreens
         composable(SignIn.route) {
             SignInScreen(onSignUp = { navController.navigate(SignUp.route) })
@@ -35,7 +36,6 @@ fun FirebaseChatNavHost(
         composable(SignUp.route) {
             SignUpScreen(
                 onSuccessSignUp = {
-                    onAuth()
                     navController.navigateToTop(Home.route)
                 },
                 onGoToSignIn = { navController.popBackStack() })
@@ -44,14 +44,17 @@ fun FirebaseChatNavHost(
         // HomeScreens
         composable(Home.route) {
             HomeScreen(
-                currentScreen,
-                onTabChange = { screen -> navController.navigate(screen.route) })
+                onChatClick = { chat -> navController.navigate("${Chats.route}/${chat.id}") },
+                onTabSelected = onTabSelected,
+                currentScreen = currentScreen
+            )
         }
         composable(People.route) {
-            PeopleScreen()
+            PeopleScreen(onTabSelected = onTabSelected, currentScreen = currentScreen)
         }
-        composable(Chats.route) {
-            ChatScreen()
+        composable(route = Chats.routeWithArgs, arguments = Chats.arguments) { navBackStackEntry ->
+            val chatId = navBackStackEntry.arguments?.getString(Chats.chatIdArg)
+            ChatScreen(chatId)
         }
 
     }

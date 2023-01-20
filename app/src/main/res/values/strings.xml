@@ -13,6 +13,7 @@
     <!--Sign Up Screen-->
     <string name="already_have_account">Already have an account?</string>
     <string name="login">Login</string>
+    <string name="name">Name</string>
 
     <!--Tabs-->
     <string name="home">Home</string>
