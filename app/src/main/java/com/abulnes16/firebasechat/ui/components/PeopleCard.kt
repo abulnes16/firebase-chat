@@ -1,6 +1,7 @@
 package com.abulnes16.firebasechat.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,12 +14,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.abulnes16.firebasechat.data.Chat
 
 @Composable
-fun PeopleCard(name: String, modifier: Modifier = Modifier) {
+fun PeopleCard(name: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(16.dp)
+        modifier = modifier
+            .padding(16.dp)
+            .clickable { onClick() }
     ) {
         Image(
             imageVector = Icons.Filled.AccountCircle,
@@ -40,5 +44,5 @@ fun PeopleCard(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun PeopleCardPreview() {
-    PeopleCard(name = "Angel")
+    PeopleCard(name = "Angel", onClick = {})
 }

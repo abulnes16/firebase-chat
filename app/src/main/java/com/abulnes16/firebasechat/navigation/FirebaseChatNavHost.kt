@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
+import com.abulnes16.firebasechat.data.Chat
 import com.abulnes16.firebasechat.ui.screens.auth.SignInScreen
 import com.abulnes16.firebasechat.ui.screens.auth.SignUpScreen
 import com.abulnes16.firebasechat.ui.screens.home.ChatScreen
@@ -23,6 +24,8 @@ fun FirebaseChatNavHost(
 ) {
     val onTabSelected: (HomeDestinations) -> Unit =
         { screen -> navController.navigate(screen.route) }
+
+
     NavHost(
         navController = navController,
         startDestination = SignIn.route,
@@ -44,13 +47,16 @@ fun FirebaseChatNavHost(
         // HomeScreens
         composable(Home.route) {
             HomeScreen(
-                onChatClick = { chat -> navController.navigate("${Chats.route}/${chat.id}") },
+                onChatClick = { chat -> navController.navigateToChat(chat) },
                 onTabSelected = onTabSelected,
                 currentScreen = currentScreen
             )
         }
         composable(People.route) {
-            PeopleScreen(onTabSelected = onTabSelected, currentScreen = currentScreen)
+            PeopleScreen(
+                onTabSelected = onTabSelected,
+                currentScreen = currentScreen,
+                onSelectPeople = { navController.navigateToChat(null) })
         }
         composable(route = Chats.routeWithArgs, arguments = Chats.arguments) { navBackStackEntry ->
             val chatId = navBackStackEntry.arguments?.getString(Chats.chatIdArg)
@@ -66,4 +72,8 @@ fun NavHostController.navigateToTop(route: String) {
             saveState = true
         }
     }
+}
+
+fun NavHostController.navigateToChat(chat: Chat?) {
+    this.navigate("${Chats.route}/${chat?.id}")
 }

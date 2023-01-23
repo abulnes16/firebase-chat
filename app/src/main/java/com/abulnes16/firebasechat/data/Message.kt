@@ -7,15 +7,16 @@ data class Message(
     val content: String,
     val date: Date,
     val read: Boolean,
-    val sender: String
+    val name: String,
+    val isMine: Boolean
 )
 
 
-val mockMessages = listOf<Message>(
-    Message(id = "1", content = "Hola", date = Date(), read = true, sender = "1"),
-    Message(id = "2", content = "¿Que tal?", date = Date(), read = true, sender = "2"),
-    Message(id = "3", content = "Todo bien", date = Date(), read = true, sender = "1"),
-    Message(id = "4", content = "¿Y vos?", date = Date(), read = true, sender = "2"),
-    Message(id = "5", content = "Tudo bem?", date = Date(), read = true, sender = "1"),
-    Message(id = "6", content = "Sim", date = Date(), read = true, sender = "2"),
+val mockMessages = listOf(
+    Message(id = "1", name = "Angel", content = "Hola", date = Date(), read = true, isMine = true),
+    Message(id = "2", name = "Jose", content = "¿Que tal?", date = Date(), read = true, isMine = false),
+    Message(id = "3", name = "Angel", content = "Todo bien", date = Date(), read = true, isMine = true),
+    Message(id = "4", name = "Jose", content = "¿Y vos?", date = Date(), read = true, isMine = false),
+    Message(id = "5", name = "Angel", content = "Tudo bem?", date = Date(), read = true, isMine = false),
+    Message(id = "6", name = "Jose", content = "Sim", date = Date(), read = true, isMine = true),
 )

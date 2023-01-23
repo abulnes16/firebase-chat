@@ -7,6 +7,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.abulnes16.firebasechat.data.Chat
 import com.abulnes16.firebasechat.data.mockUsers
 import com.abulnes16.firebasechat.navigation.HomeDestinations
 import com.abulnes16.firebasechat.navigation.People
@@ -18,6 +19,7 @@ import com.abulnes16.firebasechat.ui.components.Screen
 @Composable
 fun PeopleScreen(
     onTabSelected: (HomeDestinations) -> Unit,
+    onSelectPeople: (Chat?)-> Unit,
     currentScreen: HomeDestinations
 ) {
     Scaffold(
@@ -32,7 +34,7 @@ fun PeopleScreen(
         Screen(arrangement = Arrangement.Top) {
             LazyColumn() {
                 items(mockUsers) { user ->
-                    PeopleCard(name = user.name)
+                    PeopleCard(name = user.name, onClick = { onSelectPeople(null) })
                 }
             }
         }
@@ -43,5 +45,5 @@ fun PeopleScreen(
 @Preview(showBackground = true)
 @Composable
 fun PeopleScreenPreview() {
-    PeopleScreen(onTabSelected = {}, currentScreen = People)
+    PeopleScreen(onTabSelected = {}, currentScreen = People, onSelectPeople = {})
 }
