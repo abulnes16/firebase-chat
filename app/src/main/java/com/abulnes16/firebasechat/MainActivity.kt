@@ -20,18 +20,25 @@ import com.abulnes16.firebasechat.navigation.homeTabs
 import com.abulnes16.firebasechat.ui.components.HomeTabs
 import com.abulnes16.firebasechat.ui.theme.FirebaseChatTheme
 import com.abulnes16.firebasechat.viewmodels.AuthViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
         setContent {
-            FirebaseChatApp()
+            FirebaseChatApp(auth)
         }
     }
 }
 
 @Composable
-fun FirebaseChatApp() {
+fun FirebaseChatApp(auth: FirebaseAuth) {
     FirebaseChatTheme {
         val navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
@@ -43,6 +50,7 @@ fun FirebaseChatApp() {
 
         FirebaseChatNavHost(
             navController = navController,
+            authProvider = auth,
             currentScreen = currentHomeScreen
         )
     }

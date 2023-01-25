@@ -2,64 +2,88 @@ package com.abulnes16.firebasechat.ui.screens.auth
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.abulnes16.firebasechat.R
+import com.abulnes16.firebasechat.data.RequestState
 import com.abulnes16.firebasechat.ui.components.AuthFooter
+import com.abulnes16.firebasechat.ui.components.PasswordInput
 import com.abulnes16.firebasechat.ui.components.Screen
 import com.abulnes16.firebasechat.viewmodels.AuthViewModel
+import com.abulnes16.firebasechat.viewmodels.AuthViewModelFactory
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SignUpScreen(
     onSuccessSignUp: () -> Unit,
     onGoToSignIn: () -> Unit,
-    modifier: Modifier = Modifier
+    authProvider: FirebaseAuth,
+    modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authProvider)),
 ) {
+    val focusManager = LocalFocusManager.current
     Screen(modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth(0.7f)
         ) {
             TextField(
-                value = "",
-                onValueChange = {},
+                value = authViewModel.name,
+                onValueChange = { value -> authViewModel.onChangeName(value) },
                 placeholder = {
                     Text(text = stringResource(R.string.name))
                 },
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             TextField(
-                value = "",
-                onValueChange = {},
+                value = authViewModel.email,
+                onValueChange = { value -> authViewModel.onChangeEmail(value) },
                 placeholder = {
                     Text(text = stringResource(R.string.email))
                 },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Email
+                ),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            TextField(
-                value = "", onValueChange = {},
-                placeholder = {
-                    Text(text = stringResource(R.string.password))
-                }
+            PasswordInput(
+                value = authViewModel.password,
+                onValueChange = { value -> authViewModel.onChangePassword(value) },
+                onDone = { focusManager.clearFocus() },
             )
-            Button(
-                onClick = { onSuccessSignUp() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ) {
-                Text(text = stringResource(R.string.sign_up))
-            }
+            when (authViewModel.requestStatus) {
+                RequestState.NONE,
+                RequestState.FAILED -> Button(
+                    // TODO: Add failed path
+                    onClick = { authViewModel.onSignUp(onSuccessSignUp, {}) },
+                    enabled = authViewModel.onValidateForm(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                ) {
+                    Text(text = stringResource(R.string.sign_up))
+                }
 
+                RequestState.LOADING -> CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
+                else -> {
+                    // TODO: Add else management
+                }
+            }
             AuthFooter(
                 leftText = R.string.already_have_account,
                 rightText = R.string.login,
@@ -73,5 +97,6 @@ fun SignUpScreen(
 @Preview(showBackground = true)
 @Composable
 fun SignUpScreenPreview() {
-    SignUpScreen({}, {})
+    val auth = Firebase.auth
+    SignUpScreen({}, {}, authProvider = auth)
 }

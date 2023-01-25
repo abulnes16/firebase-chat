@@ -15,10 +15,12 @@ import com.abulnes16.firebasechat.ui.screens.home.ChatScreen
 import com.abulnes16.firebasechat.ui.screens.home.HomeScreen
 import com.abulnes16.firebasechat.ui.screens.home.PeopleScreen
 import com.abulnes16.firebasechat.viewmodels.AuthViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun FirebaseChatNavHost(
     navController: NavHostController,
+    authProvider: FirebaseAuth,
     currentScreen: HomeDestinations,
     modifier: Modifier = Modifier,
 ) {
@@ -34,14 +36,20 @@ fun FirebaseChatNavHost(
 
         // AuthScreens
         composable(SignIn.route) {
-            SignInScreen(onSignUp = { navController.navigate(SignUp.route) })
+            SignInScreen(
+                onSignUp = { navController.navigate(SignUp.route) },
+                onSuccessSignIn = { navController.navigateToTop(Home.route) },
+                authProvider = authProvider
+            )
         }
         composable(SignUp.route) {
             SignUpScreen(
                 onSuccessSignUp = {
                     navController.navigateToTop(Home.route)
                 },
-                onGoToSignIn = { navController.popBackStack() })
+                onGoToSignIn = { navController.popBackStack() },
+                authProvider = authProvider
+            )
         }
 
         // HomeScreens
