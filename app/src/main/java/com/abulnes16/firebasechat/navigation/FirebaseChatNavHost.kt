@@ -20,7 +20,6 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun FirebaseChatNavHost(
     navController: NavHostController,
-    authProvider: FirebaseAuth,
     currentScreen: HomeDestinations,
     modifier: Modifier = Modifier,
 ) {
@@ -39,7 +38,6 @@ fun FirebaseChatNavHost(
             SignInScreen(
                 onSignUp = { navController.navigate(SignUp.route) },
                 onSuccessSignIn = { navController.navigateToTop(Home.route) },
-                authProvider = authProvider
             )
         }
         composable(SignUp.route) {
@@ -48,7 +46,6 @@ fun FirebaseChatNavHost(
                     navController.navigateToTop(Home.route)
                 },
                 onGoToSignIn = { navController.popBackStack() },
-                authProvider = authProvider
             )
         }
 

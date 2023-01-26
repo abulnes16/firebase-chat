@@ -26,19 +26,19 @@ import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var auth: FirebaseAuth
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        auth = Firebase.auth
+
         setContent {
-            FirebaseChatApp(auth)
+            FirebaseChatApp()
         }
     }
 }
 
 @Composable
-fun FirebaseChatApp(auth: FirebaseAuth) {
+fun FirebaseChatApp() {
     FirebaseChatTheme {
         val navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
@@ -50,7 +50,6 @@ fun FirebaseChatApp(auth: FirebaseAuth) {
 
         FirebaseChatNavHost(
             navController = navController,
-            authProvider = auth,
             currentScreen = currentHomeScreen
         )
     }

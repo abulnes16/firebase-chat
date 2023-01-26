@@ -21,4 +21,9 @@
 
     <!--Messages -->
     <string name="type_something">Type something</string>
+
+    <!--Errors-->
+    <string name="error_sign_up">We couldn\'t  sign you up, please try again</string>
+    <string name="error_sign_in">We couldn\'t  sign you in, check your email and password</string>
+
 </resources>

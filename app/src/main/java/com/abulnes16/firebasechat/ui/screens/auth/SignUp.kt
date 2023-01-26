@@ -1,5 +1,6 @@
 package com.abulnes16.firebasechat.ui.screens.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -8,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,17 +28,26 @@ import com.abulnes16.firebasechat.viewmodels.AuthViewModel
 import com.abulnes16.firebasechat.viewmodels.AuthViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SignUpScreen(
     onSuccessSignUp: () -> Unit,
     onGoToSignIn: () -> Unit,
-    authProvider: FirebaseAuth,
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authProvider)),
+    authViewModel: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(
+            authProvider = Firebase.auth,
+            dbProvider = Firebase.firestore
+        )
+    ),
 ) {
+
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
+
     Screen(modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -66,11 +77,19 @@ fun SignUpScreen(
                 onValueChange = { value -> authViewModel.onChangePassword(value) },
                 onDone = { focusManager.clearFocus() },
             )
-            when (authViewModel.requestStatus) {
-                RequestState.NONE,
-                RequestState.FAILED -> Button(
-                    // TODO: Add failed path
-                    onClick = { authViewModel.onSignUp(onSuccessSignUp, {}) },
+            if (authViewModel.requestStatus === RequestState.LOADING) {
+                CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
+            } else {
+                Button(
+                    onClick = {
+                        authViewModel.onSignUp(onSuccess = onSuccessSignUp, onFailed = {
+                            Toast.makeText(
+                                context,
+                                R.string.error_sign_up,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        })
+                    },
                     enabled = authViewModel.onValidateForm(),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -79,10 +98,6 @@ fun SignUpScreen(
                     Text(text = stringResource(R.string.sign_up))
                 }
 
-                RequestState.LOADING -> CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
-                else -> {
-                    // TODO: Add else management
-                }
             }
             AuthFooter(
                 leftText = R.string.already_have_account,
@@ -97,6 +112,5 @@ fun SignUpScreen(
 @Preview(showBackground = true)
 @Composable
 fun SignUpScreenPreview() {
-    val auth = Firebase.auth
-    SignUpScreen({}, {}, authProvider = auth)
+    SignUpScreen({}, {})
 }
