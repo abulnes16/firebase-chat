@@ -1,16 +1,15 @@
 package com.abulnes16.firebasechat.ui.screens.auth
 
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,9 +18,12 @@ import com.abulnes16.firebasechat.data.RequestState
 import com.abulnes16.firebasechat.ui.components.AuthFooter
 import com.abulnes16.firebasechat.ui.components.PasswordInput
 import com.abulnes16.firebasechat.ui.components.Screen
+import com.abulnes16.firebasechat.ui.launchers.rememberFirebaseAuthLauncher
 import com.abulnes16.firebasechat.viewmodels.AuthViewModel
 import com.abulnes16.firebasechat.viewmodels.AuthViewModelFactory
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -41,6 +43,24 @@ fun SignInScreen(
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val token = stringResource(id = R.string.google_web_client_id)
+
+    val onFailed: (ApiException) -> Unit = remember {
+        { _ ->
+
+            Toast.makeText(
+                context,
+                R.string.error_sign_in,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+    }
+    val launcher =
+        rememberFirebaseAuthLauncher(onAuthComplete = { _ ->
+            onSuccessSignIn ()
+        }, onAuthError = onFailed)
+
     Screen(modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -82,7 +102,15 @@ fun SignInScreen(
 
             }
 
-            OutlinedButton(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = {
+                val gso =
+                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(token)
+                        .requestEmail()
+                        .build()
+                val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                launcher.launch(googleSignInClient.signInIntent)
+            }, modifier = Modifier.fillMaxWidth()) {
                 Text(text = stringResource(R.string.sign_in_with_google))
             }
             AuthFooter(
