@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.abulnes16.firebasechat.R
 import com.abulnes16.firebasechat.data.RequestState
+import com.abulnes16.firebasechat.repository.FirestoreService
 import com.abulnes16.firebasechat.ui.components.AuthFooter
 import com.abulnes16.firebasechat.ui.components.PasswordInput
 import com.abulnes16.firebasechat.ui.components.Screen
@@ -37,7 +38,7 @@ fun SignInScreen(
     authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(
             authProvider = Firebase.auth,
-            dbProvider = Firebase.firestore
+            repository = FirestoreService
         )
     ),
 ) {
@@ -45,21 +46,16 @@ fun SignInScreen(
     val context = LocalContext.current
     val token = stringResource(id = R.string.google_web_client_id)
 
-    val onFailed: (ApiException) -> Unit = remember {
-        { _ ->
-
-            Toast.makeText(
-                context,
-                R.string.error_sign_in,
-                Toast.LENGTH_LONG
-            ).show()
-        }
-
-    }
     val launcher =
         rememberFirebaseAuthLauncher(onAuthComplete = { _ ->
-            onSuccessSignIn ()
-        }, onAuthError = onFailed)
+            onSuccessSignIn()
+        }, onAuthError = { _ ->
+            Toast.makeText(
+                context,
+                R.string.error_sign_in_google,
+                Toast.LENGTH_LONG
+            ).show()
+        })
 
     Screen(modifier) {
         Column(

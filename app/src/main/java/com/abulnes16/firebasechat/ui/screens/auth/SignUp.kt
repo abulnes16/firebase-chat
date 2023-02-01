@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.abulnes16.firebasechat.R
 import com.abulnes16.firebasechat.data.RequestState
+import com.abulnes16.firebasechat.repository.FirestoreService
 import com.abulnes16.firebasechat.ui.components.AuthFooter
 import com.abulnes16.firebasechat.ui.components.PasswordInput
 import com.abulnes16.firebasechat.ui.components.Screen
@@ -39,7 +40,7 @@ fun SignUpScreen(
     authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(
             authProvider = Firebase.auth,
-            dbProvider = Firebase.firestore
+            repository = FirestoreService
         )
     ),
 ) {

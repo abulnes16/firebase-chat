@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.abulnes16.firebasechat.data.Collections
 import com.abulnes16.firebasechat.data.RequestState
 import com.abulnes16.firebasechat.data.User
+import com.abulnes16.firebasechat.repository.FirestoreService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,7 @@ private const val TAG = "[Authentication]"
 
 class AuthViewModel(
     private val authProvider: FirebaseAuth,
-    private val dbProvider: FirebaseFirestore
+    private val repository: FirestoreService
 ) : ViewModel() {
     private var _name by mutableStateOf("")
     private var _email by mutableStateOf("")
@@ -67,8 +68,12 @@ class AuthViewModel(
             try {
                 val result = authProvider.createUserWithEmailAndPassword(_email, _password).await()
                 val userId = result.user?.uid ?: ""
-                val user = User(id = userId, name = _name)
-                dbProvider.collection(Collections.USERS.collection).add(user).await()
+                val userResult = repository.createUser(name, userId)
+
+                if (!userResult) {
+                    throw Exception("User wasn't saved")
+                }
+
 
                 Log.d(TAG, "Success Signup ${result.user}")
                 _requestStatus = RequestState.SUCCESS
@@ -106,12 +111,12 @@ class AuthViewModel(
 
 class AuthViewModelFactory(
     private val authProvider: FirebaseAuth,
-    private val dbProvider: FirebaseFirestore
+    private val repository: FirestoreService
 ) :
     ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return AuthViewModel(authProvider, dbProvider) as T
+        return AuthViewModel(authProvider, repository) as T
     }
 }
 
