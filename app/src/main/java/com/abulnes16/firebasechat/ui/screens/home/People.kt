@@ -1,8 +1,6 @@
 package com.abulnes16.firebasechat.ui.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,11 +9,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.abulnes16.firebasechat.R
 import com.abulnes16.firebasechat.data.Chat
 import com.abulnes16.firebasechat.data.RequestState
-import com.abulnes16.firebasechat.data.mockUsers
 import com.abulnes16.firebasechat.navigation.HomeDestinations
 import com.abulnes16.firebasechat.navigation.People
 import com.abulnes16.firebasechat.navigation.homeTabs
-import com.abulnes16.firebasechat.repository.FirestoreService
+import com.abulnes16.firebasechat.database.FirestoreService
 import com.abulnes16.firebasechat.ui.components.HomeTabs
 import com.abulnes16.firebasechat.ui.components.LoadingList
 import com.abulnes16.firebasechat.ui.components.PeopleCard
@@ -30,7 +27,7 @@ fun PeopleScreen(
     onSelectPeople: (Chat?) -> Unit,
     currentScreen: HomeDestinations,
     modifier: Modifier = Modifier,
-    userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(repository = FirestoreService))
+    userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(db = FirestoreService))
 ) {
     Scaffold(
         topBar = {

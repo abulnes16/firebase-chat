@@ -9,12 +9,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.abulnes16.firebasechat.data.Chat
 import com.abulnes16.firebasechat.data.RequestState
-import com.abulnes16.firebasechat.repository.FirestoreService
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.abulnes16.firebasechat.database.FirestoreService
 import kotlinx.coroutines.launch
 
-class ChatViewModel(private val repository: FirestoreService) : ViewModel() {
+class HomeViewModel(private val db: FirestoreService) : ViewModel() {
 
     private var _chats by mutableStateOf<List<Chat?>>(listOf())
     private var _requestState by mutableStateOf(RequestState.NONE)
@@ -33,7 +31,7 @@ class ChatViewModel(private val repository: FirestoreService) : ViewModel() {
     private fun fetchChats() {
         _requestState = RequestState.LOADING
         viewModelScope.launch {
-            val fetchedChats = repository.getChats()
+            val fetchedChats = db.getChats()
             _chats = if (fetchedChats.isNullOrEmpty()) {
                 listOf()
             } else {
@@ -46,12 +44,12 @@ class ChatViewModel(private val repository: FirestoreService) : ViewModel() {
 }
 
 
-class ChatViewModelFactory(
-    private val repository: FirestoreService
+class HomeViewModelFactory(
+    private val db: FirestoreService
 ) :
     ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ChatViewModel(repository) as T
+        return HomeViewModel(db) as T
     }
 }

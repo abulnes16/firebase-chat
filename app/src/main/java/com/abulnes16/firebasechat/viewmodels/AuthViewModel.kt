@@ -1,20 +1,13 @@
 package com.abulnes16.firebasechat.viewmodels
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.abulnes16.firebasechat.data.Collections
 import com.abulnes16.firebasechat.data.RequestState
-import com.abulnes16.firebasechat.data.User
-import com.abulnes16.firebasechat.repository.FirestoreService
+import com.abulnes16.firebasechat.database.FirestoreService
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -22,7 +15,7 @@ private const val TAG = "[Authentication]"
 
 class AuthViewModel(
     private val authProvider: FirebaseAuth,
-    private val repository: FirestoreService
+    private val db: FirestoreService
 ) : ViewModel() {
     private var _name by mutableStateOf("")
     private var _email by mutableStateOf("")
@@ -68,7 +61,7 @@ class AuthViewModel(
             try {
                 val result = authProvider.createUserWithEmailAndPassword(_email, _password).await()
                 val userId = result.user?.uid ?: ""
-                val userResult = repository.createUser(name, userId)
+                val userResult = db.createUser(name, userId)
 
                 if (!userResult) {
                     throw Exception("User wasn't saved")
@@ -111,12 +104,12 @@ class AuthViewModel(
 
 class AuthViewModelFactory(
     private val authProvider: FirebaseAuth,
-    private val repository: FirestoreService
+    private val db: FirestoreService
 ) :
     ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return AuthViewModel(authProvider, repository) as T
+        return AuthViewModel(authProvider, db) as T
     }
 }
 

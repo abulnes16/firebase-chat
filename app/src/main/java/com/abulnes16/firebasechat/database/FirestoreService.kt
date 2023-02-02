@@ -1,4 +1,4 @@
-package com.abulnes16.firebasechat.repository
+package com.abulnes16.firebasechat.database
 
 import android.util.Log
 import com.abulnes16.firebasechat.data.Chat

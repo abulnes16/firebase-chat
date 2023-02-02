@@ -8,18 +8,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.abulnes16.firebasechat.data.Chat
 import com.abulnes16.firebasechat.data.RequestState
-import com.abulnes16.firebasechat.data.mockChats
 import com.abulnes16.firebasechat.navigation.Home
 import com.abulnes16.firebasechat.navigation.HomeDestinations
 import com.abulnes16.firebasechat.navigation.homeTabs
 import com.abulnes16.firebasechat.ui.components.Chat
 import com.abulnes16.firebasechat.ui.components.HomeTabs
 import com.abulnes16.firebasechat.ui.components.Screen
-import com.abulnes16.firebasechat.viewmodels.ChatViewModel
 import com.abulnes16.firebasechat.R
-import com.abulnes16.firebasechat.repository.FirestoreService
+import com.abulnes16.firebasechat.database.FirestoreService
 import com.abulnes16.firebasechat.ui.components.LoadingList
-import com.abulnes16.firebasechat.viewmodels.ChatViewModelFactory
+import com.abulnes16.firebasechat.viewmodels.HomeViewModel
+import com.abulnes16.firebasechat.viewmodels.HomeViewModelFactory
 
 @Composable
 fun HomeScreen(
@@ -27,7 +26,7 @@ fun HomeScreen(
     onTabSelected: (HomeDestinations) -> Unit,
     currentScreen: HomeDestinations,
     modifier: Modifier = Modifier,
-    chatViewModel: ChatViewModel = viewModel(factory = ChatViewModelFactory(repository = FirestoreService))
+    chatViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(db = FirestoreService))
 ) {
     Scaffold(topBar = {
         HomeTabs(

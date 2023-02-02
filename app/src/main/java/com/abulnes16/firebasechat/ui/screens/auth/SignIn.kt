@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.abulnes16.firebasechat.R
 import com.abulnes16.firebasechat.data.RequestState
-import com.abulnes16.firebasechat.repository.FirestoreService
+import com.abulnes16.firebasechat.database.FirestoreService
 import com.abulnes16.firebasechat.ui.components.AuthFooter
 import com.abulnes16.firebasechat.ui.components.PasswordInput
 import com.abulnes16.firebasechat.ui.components.Screen
@@ -24,9 +23,7 @@ import com.abulnes16.firebasechat.viewmodels.AuthViewModel
 import com.abulnes16.firebasechat.viewmodels.AuthViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 
@@ -38,7 +35,7 @@ fun SignInScreen(
     authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(
             authProvider = Firebase.auth,
-            repository = FirestoreService
+            db = FirestoreService
         )
     ),
 ) {
