@@ -17,28 +17,24 @@ import com.abulnes16.firebasechat.ui.components.Screen
 import com.abulnes16.firebasechat.R
 import com.abulnes16.firebasechat.database.FirestoreService
 import com.abulnes16.firebasechat.ui.components.LoadingList
+import com.abulnes16.firebasechat.viewmodels.AuthViewModel
+import com.abulnes16.firebasechat.viewmodels.AuthViewModelFactory
 import com.abulnes16.firebasechat.viewmodels.HomeViewModel
 import com.abulnes16.firebasechat.viewmodels.HomeViewModelFactory
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun HomeScreen(
     onChatClick: (Chat) -> Unit,
-    onTabSelected: (HomeDestinations) -> Unit,
-    currentScreen: HomeDestinations,
     modifier: Modifier = Modifier,
-    chatViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(db = FirestoreService))
+    homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(db = FirestoreService)),
 ) {
-    Scaffold(topBar = {
-        HomeTabs(
-            allTabs = homeTabs,
-            onTabSelected = onTabSelected,
-            currentScreen = currentScreen
-        )
-    }, modifier = modifier) {
-        Screen(arrangement = Arrangement.Top) {
+
+        Screen(arrangement = Arrangement.Top, modifier = modifier) {
             LoadingList(
-                loading = chatViewModel.requestState === RequestState.LOADING,
-                data = chatViewModel.chats,
+                loading = homeViewModel.requestState === RequestState.LOADING,
+                data = homeViewModel.chats,
                 emptyPlaceholder = R.string.empty_chats
             ) {
                 if (it != null) {
@@ -50,12 +46,12 @@ fun HomeScreen(
                 }
             }
         }
-    }
+
 
 }
 
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(onChatClick = {}, currentScreen = Home, onTabSelected = {})
+    HomeScreen(onChatClick = {})
 }

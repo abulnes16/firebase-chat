@@ -23,6 +23,8 @@ import com.abulnes16.firebasechat.viewmodels.AuthViewModel
 import com.abulnes16.firebasechat.viewmodels.AuthViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -30,7 +32,7 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun SignInScreen(
     onSignUp: () -> Unit,
-    onSuccessSignIn: () -> Unit,
+    onSuccessThirdPartySignIn: (FirebaseUser) -> Unit,
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(
@@ -44,8 +46,8 @@ fun SignInScreen(
     val token = stringResource(id = R.string.google_web_client_id)
 
     val launcher =
-        rememberFirebaseAuthLauncher(onAuthComplete = { _ ->
-            onSuccessSignIn()
+        rememberFirebaseAuthLauncher(onAuthComplete = { result ->
+            onSuccessThirdPartySignIn(result.user!!)
         }, onAuthError = { _ ->
             Toast.makeText(
                 context,
@@ -77,20 +79,20 @@ fun SignInScreen(
             } else {
                 Button(
                     onClick = {
-                        authViewModel.onSignIn(onSuccess = onSuccessSignIn, onFailed = {
+                        authViewModel.onSignIn {
                             Toast.makeText(
                                 context,
                                 R.string.error_sign_in,
                                 Toast.LENGTH_LONG
                             ).show()
-                        })
+                        }
                     },
                     enabled = authViewModel.onValidateSignIn(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp)
                 ) {
-                    Text(text = stringResource(R.string.sign_up))
+                    Text(text = stringResource(R.string.sign_in))
                 }
 
             }

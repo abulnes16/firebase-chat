@@ -27,7 +27,6 @@ import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SignUpScreen(
-    onSuccessSignUp: () -> Unit,
     onGoToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel(
@@ -76,7 +75,7 @@ fun SignUpScreen(
             } else {
                 Button(
                     onClick = {
-                        authViewModel.onSignUp(onSuccess = onSuccessSignUp, onFailed = {
+                        authViewModel.onSignUp(onFailed = {
                             Toast.makeText(
                                 context,
                                 R.string.error_sign_up,
@@ -106,5 +105,5 @@ fun SignUpScreen(
 @Preview(showBackground = true)
 @Composable
 fun SignUpScreenPreview() {
-    SignUpScreen({}, {})
+    SignUpScreen({})
 }

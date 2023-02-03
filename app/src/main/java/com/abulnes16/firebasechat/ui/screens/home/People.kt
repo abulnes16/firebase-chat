@@ -23,37 +23,26 @@ import com.abulnes16.firebasechat.viewmodels.UserViewModelFactory
 
 @Composable
 fun PeopleScreen(
-    onTabSelected: (HomeDestinations) -> Unit,
     onSelectPeople: (Chat?) -> Unit,
-    currentScreen: HomeDestinations,
     modifier: Modifier = Modifier,
     userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(db = FirestoreService))
 ) {
-    Scaffold(
-        topBar = {
-            HomeTabs(
-                allTabs = homeTabs,
-                onTabSelected = onTabSelected,
-                currentScreen = currentScreen
-            )
-        },
-        modifier = modifier
-    ) {
-        Screen(arrangement = Arrangement.Top) {
-            LoadingList(
-                loading = userViewModel.requestState == RequestState.LOADING,
-                data = userViewModel.users,
-                emptyPlaceholder = R.string.empty_people
-            ) {
-                PeopleCard(name = it.name, onClick = { onSelectPeople(null) })
-            }
-        }
 
+    Screen(arrangement = Arrangement.Top, modifier = modifier) {
+        LoadingList(
+            loading = userViewModel.requestState == RequestState.LOADING,
+            data = userViewModel.users,
+            emptyPlaceholder = R.string.empty_people
+        ) {
+            PeopleCard(name = it.name, onClick = { onSelectPeople(null) })
+        }
     }
+
 }
+
 
 @Preview(showBackground = true)
 @Composable
 fun PeopleScreenPreview() {
-    PeopleScreen(onTabSelected = {}, currentScreen = People, onSelectPeople = {})
+    PeopleScreen(onSelectPeople = {})
 }

@@ -6,6 +6,8 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,27 +28,49 @@ private val TabHeight = 50.dp
 fun HomeTabs(
     allTabs: List<HomeDestinations>,
     onTabSelected: (HomeDestinations) -> Unit,
+    onLogout: () -> Unit,
     currentScreen: HomeDestinations,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(TabHeight)
-    ) {
-        val tabSize = 1f / allTabs.size
-        Row(modifier.selectableGroup()) {
-            allTabs.forEach { screen ->
-                HomeTab(
-                    name = screen.tabName,
-                    icon = screen.icon,
-                    selected = currentScreen == screen,
-                    onSelected = { onTabSelected(screen) },
-                    modifier = Modifier.weight(tabSize)
-                )
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Surface(
+            color = MaterialTheme.colors.primary,
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Firebase Chat", style = MaterialTheme.typography.h6)
+                IconButton(onClick = onLogout) {
+                    Icon(imageVector = Icons.Filled.ExitToApp, contentDescription = null)
+                }
+            }
+        }
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(TabHeight)
+        ) {
+            val tabSize = 1f / allTabs.size
+            Row(modifier.selectableGroup()) {
+                allTabs.forEach { screen ->
+                    HomeTab(
+                        name = screen.tabName,
+                        icon = screen.icon,
+                        selected = currentScreen == screen,
+                        onSelected = { onTabSelected(screen) },
+                        modifier = Modifier.weight(tabSize)
+                    )
+                }
             }
         }
     }
+
 }
 
 @Composable
@@ -85,6 +109,6 @@ fun HomeTabPreview() {
 @Preview
 @Composable
 fun HomeTabsPreview() {
-    HomeTabs(allTabs = homeTabs, onTabSelected = {}, currentScreen = Home)
+    HomeTabs(allTabs = homeTabs, onTabSelected = {}, currentScreen = Home, onLogout = {})
 }
 

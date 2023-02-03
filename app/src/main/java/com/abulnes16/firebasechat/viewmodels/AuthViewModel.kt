@@ -7,7 +7,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.abulnes16.firebasechat.data.RequestState
 import com.abulnes16.firebasechat.database.FirestoreService
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -21,6 +24,7 @@ class AuthViewModel(
     private var _email by mutableStateOf("")
     private var _password by mutableStateOf("")
     private var _requestStatus by mutableStateOf(RequestState.NONE)
+    private var _currentUser by mutableStateOf<FirebaseUser?>(null)
 
 
     val name: String
@@ -33,6 +37,13 @@ class AuthViewModel(
     val requestStatus: RequestState
         get() = _requestStatus
 
+
+    val currentUser: FirebaseUser?
+        get() = _currentUser
+
+    init {
+        _currentUser = authProvider.currentUser
+    }
 
     fun onChangeName(value: String) {
         _name = value
@@ -54,8 +65,12 @@ class AuthViewModel(
         return _email.isNotEmpty() && _password.isNotEmpty()
     }
 
+    fun onThirdPartyComplete(result: FirebaseUser) {
+        _currentUser = result
+    }
 
-    fun onSignUp(onSuccess: () -> Unit, onFailed: () -> Unit) {
+
+    fun onSignUp(onFailed: () -> Unit) {
         _requestStatus = RequestState.LOADING
         viewModelScope.launch {
             try {
@@ -70,7 +85,7 @@ class AuthViewModel(
 
                 Log.d(TAG, "Success Signup ${result.user}")
                 _requestStatus = RequestState.SUCCESS
-                onSuccess()
+                clearInfo()
             } catch (e: Exception) {
                 _requestStatus = RequestState.FAILED
                 Log.w(TAG, "Failed sign up ${e.message}")
@@ -81,14 +96,16 @@ class AuthViewModel(
     }
 
 
-    fun onSignIn(onSuccess: () -> Unit, onFailed: () -> Unit) {
+    fun onSignIn(onFailed: () -> Unit) {
         _requestStatus = RequestState.LOADING
         viewModelScope.launch {
             try {
                 val result = authProvider.signInWithEmailAndPassword(_email, _password).await()
                 Log.d(TAG, "Success Sign In ${result.user}")
                 _requestStatus = RequestState.SUCCESS
-                onSuccess()
+                _currentUser = authProvider.currentUser
+                clearInfo()
+
             } catch (e: Exception) {
                 _requestStatus = RequestState.FAILED
                 Log.w(TAG, "Failed sign in ${e.message}")
@@ -96,6 +113,23 @@ class AuthViewModel(
             }
 
         }
+    }
+
+    fun onLogout() {
+        try {
+            authProvider.signOut()
+            _currentUser = null
+
+        } catch (e: Exception) {
+            Log.d("AuthViewModel", e.message.toString())
+        }
+
+    }
+
+    private fun clearInfo() {
+        _email = ""
+        _name = ""
+        _password = ""
     }
 
 
