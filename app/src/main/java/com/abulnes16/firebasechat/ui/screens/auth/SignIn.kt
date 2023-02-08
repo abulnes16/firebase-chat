@@ -13,17 +13,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.abulnes16.firebasechat.R
+import com.abulnes16.firebasechat.data.FormEvent
 import com.abulnes16.firebasechat.data.RequestState
 import com.abulnes16.firebasechat.database.FirestoreService
 import com.abulnes16.firebasechat.ui.components.AuthFooter
 import com.abulnes16.firebasechat.ui.components.PasswordInput
 import com.abulnes16.firebasechat.ui.components.Screen
 import com.abulnes16.firebasechat.ui.launchers.rememberFirebaseAuthLauncher
-import com.abulnes16.firebasechat.viewmodels.AuthViewModel
-import com.abulnes16.firebasechat.viewmodels.AuthViewModelFactory
+import com.abulnes16.firebasechat.viewmodels.LoginViewModel
+import com.abulnes16.firebasechat.viewmodels.LoginViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -32,10 +32,10 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun SignInScreen(
     onSignUp: () -> Unit,
-    onSuccessThirdPartySignIn: (FirebaseUser) -> Unit,
+    onSuccessSignIn: (FirebaseUser?) -> Unit,
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(
+    loginViewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(
             authProvider = Firebase.auth,
             db = FirestoreService
         )
@@ -47,7 +47,7 @@ fun SignInScreen(
 
     val launcher =
         rememberFirebaseAuthLauncher(onAuthComplete = { result ->
-            onSuccessThirdPartySignIn(result.user!!)
+            onSuccessSignIn(result.user!!)
         }, onAuthError = { _ ->
             Toast.makeText(
                 context,
@@ -62,32 +62,32 @@ fun SignInScreen(
             modifier = Modifier.fillMaxWidth(0.7f)
         ) {
             TextField(
-                value = authViewModel.email,
-                onValueChange = { value -> authViewModel.onChangeEmail(value) },
+                value = loginViewModel.state.email,
+                onValueChange = { value -> loginViewModel.onChange(FormEvent.OnEmailEvent(value)) },
                 placeholder = {
                     Text(text = stringResource(R.string.email))
                 },
                 modifier = Modifier.padding(vertical = 16.dp)
             )
             PasswordInput(
-                value = authViewModel.password,
-                onValueChange = { value -> authViewModel.onChangePassword(value) },
+                value = loginViewModel.state.password,
+                onValueChange = { value -> loginViewModel.onChange(FormEvent.OnPasswordEvent(value)) },
                 onDone = { focusManager.clearFocus() },
             )
-            if (authViewModel.requestStatus === RequestState.LOADING) {
+            if (loginViewModel.state.requestState === RequestState.LOADING) {
                 CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
             } else {
                 Button(
                     onClick = {
-                        authViewModel.onSignIn {
+                        loginViewModel.onSignIn(onSuccess = onSuccessSignIn, onFailed = {
                             Toast.makeText(
                                 context,
                                 R.string.error_sign_in,
                                 Toast.LENGTH_LONG
                             ).show()
-                        }
+                        })
                     },
-                    enabled = authViewModel.onValidateSignIn(),
+                    enabled = loginViewModel.onValidateSignIn(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp)

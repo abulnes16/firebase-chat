@@ -1,6 +1,10 @@
 package com.abulnes16.firebasechat.navigation
 
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -11,6 +15,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import com.abulnes16.firebasechat.data.Chat
+import com.abulnes16.firebasechat.data.FormEvent
+import com.abulnes16.firebasechat.data.User
+import com.abulnes16.firebasechat.data.UserEvent
 import com.abulnes16.firebasechat.database.FirestoreService
 import com.abulnes16.firebasechat.ui.components.HomeTabs
 import com.abulnes16.firebasechat.ui.screens.auth.SignInScreen
@@ -20,6 +27,8 @@ import com.abulnes16.firebasechat.ui.screens.home.HomeScreen
 import com.abulnes16.firebasechat.ui.screens.home.PeopleScreen
 import com.abulnes16.firebasechat.viewmodels.AuthViewModel
 import com.abulnes16.firebasechat.viewmodels.AuthViewModelFactory
+import com.abulnes16.firebasechat.viewmodels.ChatViewModel
+import com.abulnes16.firebasechat.viewmodels.ChatViewModelFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -35,7 +44,7 @@ fun FirebaseChatNavHost(
         )
     )
 ) {
-    if (authViewModel.currentUser != null) {
+    if (authViewModel.state.currentUser != null) {
         HomeNavHost(
             navController = navController,
             currentScreen = currentScreen,
@@ -57,14 +66,25 @@ fun HomeNavHost(
     val onTabSelected: (HomeDestinations) -> Unit =
         { screen -> navController.navigate(screen.route) }
 
-    Scaffold(topBar = {
-        HomeTabs(
-            allTabs = homeTabs,
-            onTabSelected = onTabSelected,
-            currentScreen = currentScreen,
-            onLogout = { authViewModel.onLogout() }
-        )
-    }, modifier = modifier) {
+    Scaffold(
+        topBar = {
+            HomeTabs(
+                allTabs = homeTabs,
+                onTabSelected = onTabSelected,
+                currentScreen = currentScreen,
+                onLogout = { authViewModel.onLogout() }
+            )
+
+        },
+        floatingActionButton = {
+            if (currentScreen == Home) {
+                FloatingActionButton(onClick = { navController.navigate(People.route) }) {
+                    Icon(imageVector = Icons.Filled.Create, contentDescription = null)
+                }
+            }
+        },
+        modifier = modifier
+    ) {
         NavHost(navController = navController, startDestination = Home.route) {
             composable(Home.route) {
                 HomeScreen(
@@ -81,7 +101,14 @@ fun HomeNavHost(
                 arguments = Chats.arguments
             ) { navBackStackEntry ->
                 val chatId = navBackStackEntry.arguments?.getString(Chats.chatIdArg)
-                ChatScreen(chatId)
+                val chatViewModel =
+                    ChatViewModel(
+                        chatId = chatId,
+                        receiver = User(id = "", name = ""),
+                        db = FirestoreService,
+                        sender = User(id = "", name = "")
+                    )
+                ChatScreen(chatViewModel = chatViewModel)
             }
         }
     }
@@ -97,13 +124,18 @@ fun AuthNavHost(
         composable(SignIn.route) {
             SignInScreen(
                 onSignUp = { navController.navigate(SignUp.route) },
-                authViewModel = authViewModel,
-                onSuccessThirdPartySignIn = { user -> authViewModel.onThirdPartyComplete(user) }
+                onSuccessSignIn = { user ->
+                    authViewModel.onUserChange(
+                        UserEvent.OnFirebaseUserEvent(
+                            user
+                        )
+                    )
+                }
             )
         }
         composable(SignUp.route) {
             SignUpScreen(
-                authViewModel = authViewModel,
+                onSuccessSignUp = { authViewModel.onUserChange(UserEvent.OnFirebaseUserEvent(it)) },
                 onGoToSignIn = { navController.popBackStack() },
             )
         }

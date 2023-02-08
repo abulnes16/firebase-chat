@@ -11,6 +11,7 @@ import com.abulnes16.firebasechat.data.mockMessages
 
 @Composable
 fun MessageList(messages: List<Message>, modifier: Modifier = Modifier) {
+
     LazyColumn(modifier = modifier) {
         items(messages) { message ->
             Message(name = message.name, text = message.content, isMine = message.isMine)
