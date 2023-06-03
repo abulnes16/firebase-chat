@@ -14,9 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.abulnes16.firebasechat.navigation.FirebaseChatNavHost
-import com.abulnes16.firebasechat.navigation.Home
-import com.abulnes16.firebasechat.navigation.homeTabs
+import com.abulnes16.firebasechat.navigation.*
 import com.abulnes16.firebasechat.ui.components.HomeTabs
 import com.abulnes16.firebasechat.ui.theme.FirebaseChatTheme
 import com.abulnes16.firebasechat.viewmodels.AuthViewModel
@@ -25,7 +23,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +43,13 @@ fun FirebaseChatApp() {
 
 
         val currentHomeScreen =
-            homeTabs.find { screen -> screen.route === currentDestination?.route } ?: Home
+            if (currentDestination?.route != null && currentDestination.route?.startsWith(Chats.route) == true) {
+                Chats
+            } else {
+                homeDestinations.find { screen -> screen.route == currentDestination?.route }
+                    ?: Home
+            }
+
 
         FirebaseChatNavHost(
             navController = navController,

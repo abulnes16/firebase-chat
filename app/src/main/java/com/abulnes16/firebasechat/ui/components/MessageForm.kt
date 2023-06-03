@@ -1,6 +1,7 @@
 package com.abulnes16.firebasechat.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,19 +20,25 @@ import androidx.compose.ui.unit.dp
 import com.abulnes16.firebasechat.R
 
 @Composable
-fun MessageForm(modifier: Modifier = Modifier) {
+fun MessageForm(
+    message: String,
+    onChangeMessage: (String) -> Unit,
+    onSendMessage: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(vertical = 8.dp)
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier.padding(vertical = 8.dp, horizontal = 8.dp)
     ) {
         TextField(
-            value = "",
-            onValueChange = {},
+            value = message,
+            onValueChange = onChangeMessage,
             placeholder = { Text(text = stringResource(id = R.string.type_something)) },
             modifier = Modifier.padding(end = 16.dp)
         )
         Button(
-            onClick = { /*TODO*/ },
+            onClick = onSendMessage,
             modifier = Modifier
                 .height(56.dp)
                 .clip(RoundedCornerShape(4.dp))
@@ -49,5 +56,5 @@ fun MessageForm(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun MessageFormPreview() {
-    MessageForm()
+    MessageForm(message =  "", onChangeMessage = {}, onSendMessage = {})
 }

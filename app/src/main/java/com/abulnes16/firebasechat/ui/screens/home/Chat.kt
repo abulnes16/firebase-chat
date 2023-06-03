@@ -1,5 +1,6 @@
 package com.abulnes16.firebasechat.ui.screens.home
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
@@ -7,16 +8,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.abulnes16.firebasechat.R
 import com.abulnes16.firebasechat.data.RequestState
-import com.abulnes16.firebasechat.data.User
-import com.abulnes16.firebasechat.data.mockMessages
-import com.abulnes16.firebasechat.database.FirestoreService
 import com.abulnes16.firebasechat.ui.components.MessageForm
 import com.abulnes16.firebasechat.ui.components.MessageList
 import com.abulnes16.firebasechat.viewmodels.ChatViewModel
-import com.abulnes16.firebasechat.viewmodels.ChatViewModelFactory
+
 
 
 @Composable
@@ -24,6 +24,7 @@ fun ChatScreen(
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -38,18 +39,37 @@ fun ChatScreen(
                     Text(text = "Retry")
                 }
             }
-            else ->
-                if (chatViewModel.chat!!.messages.isNotEmpty()) {
+            else -> {
+                if (chatViewModel.chat != null) {
                     MessageList(
                         messages = chatViewModel.chat!!.messages,
                         modifier = Modifier.weight(1f)
                     )
-                }
+                } else {
+                    Column(modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)) {}
 
+                }
+                MessageForm(
+                    message = chatViewModel.message,
+                    onChangeMessage = { value -> chatViewModel.onChangeMessage(value) },
+                    onSendMessage = {
+                        chatViewModel.sendMessage {
+                            Toast.makeText(
+                                context,
+                                R.string.error_message,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                )
+
+            }
         }
 
 
-        MessageForm()
+
     }
 }
 

@@ -23,7 +23,7 @@ import com.abulnes16.firebasechat.viewmodels.UserViewModelFactory
 
 @Composable
 fun PeopleScreen(
-    onSelectPeople: (Chat?) -> Unit,
+    onSelectPeople: (String?, String) -> Unit,
     modifier: Modifier = Modifier,
     userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(db = FirestoreService))
 ) {
@@ -34,7 +34,7 @@ fun PeopleScreen(
             data = userViewModel.users,
             emptyPlaceholder = R.string.empty_people
         ) {
-            PeopleCard(name = it.name, onClick = { onSelectPeople(null) })
+            PeopleCard(name = it.name, onClick = { onSelectPeople(null, it.id) })
         }
     }
 
@@ -44,5 +44,5 @@ fun PeopleScreen(
 @Preview(showBackground = true)
 @Composable
 fun PeopleScreenPreview() {
-    PeopleScreen(onSelectPeople = {})
+    PeopleScreen(onSelectPeople = {_, _ ->})
 }

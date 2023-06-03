@@ -15,25 +15,19 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class ChatViewModel(
-    private val receiver: User,
     private val sender: User,
+    private val receiver: String,
     private val chatId: String?,
     private val db: FirestoreService
 ) : ViewModel() {
 
-    private var _chat by mutableStateOf<Chat?>(null)
-    private var _message by mutableStateOf("")
-    private var _requestState by mutableStateOf(RequestState.NONE)
+    var chat by mutableStateOf<Chat?>(null)
+        private set
+    var message by mutableStateOf("")
+        private set
+    var requestState by mutableStateOf(RequestState.NONE)
+        private set
 
-
-    val chat: Chat?
-        get() = _chat
-
-    val requestState: RequestState
-        get() = _requestState
-
-    val message: String
-        get() = _message
 
     init {
         if (chatId != null) {
@@ -42,14 +36,18 @@ class ChatViewModel(
 
     }
 
+    fun onChangeMessage(content: String) {
+        message = content
+    }
+
     fun fetchChat() {
-        _requestState = RequestState.LOADING
+        requestState = RequestState.LOADING
         viewModelScope.launch {
             try {
-                _chat = db.getChat(chatId!!)
-                _requestState = RequestState.SUCCESS
+                chat = db.getChat(chatId!!)
+                requestState = RequestState.SUCCESS
             } catch (e: Exception) {
-                _requestState = RequestState.FAILED
+                requestState = RequestState.FAILED
             }
 
         }
@@ -68,25 +66,28 @@ class ChatViewModel(
     }
 
     private fun createChat(onFailed: () -> Unit) {
+        println("Creating the chat")
         viewModelScope.launch {
             try {
                 val currentDate = Date()
                 val message = assembleMessage(currentDate)
-                val chat = Chat(
+                val newChat = Chat(
                     id = "",
                     listOf(message),
                     sender = sender.id,
-                    receiver = receiver.id,
+                    receiver = receiver,
                     startDate = currentDate
                 )
 
-                val result = db.createChat(chat)
-                _chat = chat
+                val result = db.createChat(newChat)
+                chat = newChat
                 if (!result) {
                     throw Exception("Failed creating chat")
                 }
+                println("Chat created successfully")
             } catch (e: Exception) {
                 onFailed()
+                println("Chat failed to be created")
             }
 
         }
@@ -97,8 +98,8 @@ class ChatViewModel(
             try {
                 val currentDate = Date()
                 val message = assembleMessage(currentDate)
-                val updatedList = _chat!!.messages + message
-                _chat = _chat!!.copy(messages = updatedList)
+                val updatedList = chat!!.messages + message
+                chat = chat!!.copy(messages = updatedList)
                 val result = db.addMessage(chatId!!, updatedList)
                 if (!result) {
                     throw Exception("Failed adding message")
@@ -112,7 +113,7 @@ class ChatViewModel(
     private fun assembleMessage(currentDate: Date): Message {
         return Message(
             id = "",
-            content = _message,
+            content = message,
             date = currentDate,
             read = false,
             isMine = true,
@@ -124,7 +125,7 @@ class ChatViewModel(
 
 class ChatViewModelFactory(
     private val sender: User,
-    private val receiver: User,
+    private val receiver: String,
     private val chatId: String?,
     private val db: FirestoreService
 ) :

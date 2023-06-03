@@ -44,13 +44,14 @@ class AuthViewModel(
         }
     }
 
-    fun fetchUserData() {
+    suspend fun fetchUserData() {
         // If the user is logged in we fetch the info
         if (state.currentUser != null) {
             viewModelScope.launch {
                 try {
                     val userData = db.getUser(state.currentUser?.uid!!)
                     state = state.copy(userData = userData)
+
                 } catch (e: Exception) {
                     Log.d(TAG, e.message.toString())
                 }

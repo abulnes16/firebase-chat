@@ -1,11 +1,13 @@
 package com.abulnes16.firebasechat.navigation
 
+import android.util.Log
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -45,6 +47,11 @@ fun FirebaseChatNavHost(
     )
 ) {
     if (authViewModel.state.currentUser != null) {
+
+        LaunchedEffect(key1 = authViewModel.state.currentUser){
+            authViewModel.fetchUserData()
+        }
+
         HomeNavHost(
             navController = navController,
             currentScreen = currentScreen,
@@ -68,13 +75,15 @@ fun HomeNavHost(
 
     Scaffold(
         topBar = {
-            HomeTabs(
-                allTabs = homeTabs,
-                onTabSelected = onTabSelected,
-                currentScreen = currentScreen,
-                onLogout = { authViewModel.onLogout() }
-            )
+           if(currentScreen != Chats){
 
+               HomeTabs(
+                   allTabs = homeTabs,
+                   onTabSelected = onTabSelected,
+                   currentScreen = currentScreen,
+                   onLogout = { authViewModel.onLogout() }
+               )
+           }
         },
         floatingActionButton = {
             if (currentScreen == Home) {
@@ -88,12 +97,12 @@ fun HomeNavHost(
         NavHost(navController = navController, startDestination = Home.route) {
             composable(Home.route) {
                 HomeScreen(
-                    onChatClick = { chat -> navController.navigateToChat(chat) },
+                    onChatClick = { chatId, receiverId -> navController.navigateToChat(chatId, receiverId) },
                 )
             }
             composable(People.route) {
                 PeopleScreen(
-                    onSelectPeople = { navController.navigateToChat(null) }
+                    onSelectPeople = {_, receiverId -> navController.navigateToChat(null, receiverId) }
                 )
             }
             composable(
@@ -101,12 +110,13 @@ fun HomeNavHost(
                 arguments = Chats.arguments
             ) { navBackStackEntry ->
                 val chatId = navBackStackEntry.arguments?.getString(Chats.chatIdArg)
+                val receiverId = navBackStackEntry.arguments?.getString(Chats.receiverIdArg)
                 val chatViewModel =
                     ChatViewModel(
                         chatId = chatId,
-                        receiver = User(id = "", name = ""),
+                        receiver = receiverId ?: "",
                         db = FirestoreService,
-                        sender = User(id = "", name = "")
+                        sender = authViewModel.state.userData ?: User(id = "", name = "")
                     )
                 ChatScreen(chatViewModel = chatViewModel)
             }
@@ -151,6 +161,11 @@ fun NavHostController.navigateToTop(route: String) {
     }
 }
 
-fun NavHostController.navigateToChat(chat: Chat?) {
-    this.navigate("${Chats.route}/${chat?.id}")
+fun NavHostController.navigateToChat(chatId: String?, receiverId: String?) {
+    if(chatId != null){
+        this.navigate("${Chats.route}?receiver_id={${receiverId}}&chat_id={${chatId}}")
+    }else {
+        this.navigate("${Chats.route}?receiver_id={${receiverId}}")
+    }
+
 }

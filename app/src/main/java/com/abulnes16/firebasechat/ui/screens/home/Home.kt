@@ -26,7 +26,7 @@ import com.google.firebase.ktx.Firebase
 
 @Composable
 fun HomeScreen(
-    onChatClick: (Chat) -> Unit,
+    onChatClick: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(db = FirestoreService)),
 ) {
@@ -42,7 +42,7 @@ fun HomeScreen(
                         name = it.receiver,
                         lastMessage = it.messages.first().content,
                         date = it.messages.first().date.toString(),
-                        onClick = { onChatClick(it) })
+                        onClick = { onChatClick(it.id, it.receiver) })
                 }
             }
         }
@@ -53,5 +53,5 @@ fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(onChatClick = {})
+    HomeScreen(onChatClick = {_, _ -> })
 }
